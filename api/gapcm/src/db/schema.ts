@@ -1,8 +1,10 @@
-import { integer, pgTable, varchar, pgEnum } from "drizzle-orm/pg-core";
+import { integer, pgTable, varchar, pgEnum, boolean } from "drizzle-orm/pg-core";
 
 export const UILibValues = ["Ant", "ShadCN", "MUI"] as const;
 
-export const fieldTypes = ["number", "string", "boolean", "enum"];
+export const fieldTypesValues = ["number", "string", "boolean", "enum"] as const;
+
+export const FieldTypes = pgEnum("field_type", fieldTypesValues)
 
 export const UILib = pgEnum("ui_lib", UILibValues);
 
@@ -19,7 +21,17 @@ export const usersTable = pgTable("users", {
   email: varchar({ length: 255 }).notNull().unique(),
 });
 
-export const fieldsTable = pgTable;
+export const fieldsTable = pgTable("fields",{
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  fieldName: varchar("field_name", {length: 255}).notNull(),
+  fieldType:FieldTypes("field_type").notNull(),
+  nullable: boolean().default(true),
+  unit:boolean().default(false),
+  moduleId: integer("module_id").references(() => crudModulesTable.id, {
+    onDelete: "cascade",
+    onUpdate: "cascade",
+  }),
+})
 
 export const crudModulesTable = pgTable("crud_modules", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
