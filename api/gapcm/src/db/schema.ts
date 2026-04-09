@@ -1,4 +1,5 @@
 import { integer, pgTable, varchar, pgEnum, boolean } from "drizzle-orm/pg-core";
+import { author } from "../modules/basic_crud/author.schema";
 
 export const UILibValues = ["Ant", "ShadCN", "MUI"] as const;
 
@@ -41,3 +42,8 @@ export const crudModulesTable = pgTable("crud_modules", {
     onUpdate: "cascade",
   }),
 });
+
+
+// modules table: các bảng của các modulee code mẫu
+export const authorTable = author;
+
