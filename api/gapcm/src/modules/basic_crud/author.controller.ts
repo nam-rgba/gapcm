@@ -1,60 +1,45 @@
-import { Request, Response } from "express";
-import { authorService } from "./author.service";
 
-export const getAllAuthors = async (_req: Request, res: Response) => {
-	const data = await authorService.getAllAuthors();
-	return res.status(200).json(data);
-};
 
-export const getAuthorById = async (req: Request, res: Response) => {
-	const id = Number(req.params.id);
-	if (Number.isNaN(id)) {
-		return res.status(400).json({ message: "id không hợp lệ" });
+import { NextFunction, Request, Response } from "express"
+import { CreatedResponse } from "../../utils/success.res"
+import { authorService } from "./author.service"
+
+
+class AuthorController {
+	constructor() {}
+
+	create = async (req: Request, res: Response, next: NextFunction) => {
+		const userId = req.headers['x-user-id'] as unknown as number
+		req.body.createdBy = userId
+		new CreatedResponse('Create author successfully!', 201, await authorService.createAuthor(req.body)).send(res)
 	}
 
-	const data = await authorService.getAuthorById(id);
-	if (!data) {
-		return res.status(404).json({ message: "Không tìm thấy author" });
-	}
-	return res.status(200).json(data);
-};
-
-export const createAuthor = async (req: Request, res: Response) => {
-	try {
-		const created = await authorService.createAuthor(req.body);
-		return res.status(201).json(created);
-	} catch (error) {
-		return res.status(400).json({ message: (error as Error).message });
-	}
-};
-
-export const updateAuthor = async (req: Request, res: Response) => {
-	const id = Number(req.params.id);
-	if (Number.isNaN(id)) {
-		return res.status(400).json({ message: "id không hợp lệ" });
+	getAll = async (req: Request, res: Response, next: NextFunction) => {
+		const authors = await authorService.getAllAuthors()
+		new CreatedResponse('Get all authors successfully!', 200, authors).send(res)
 	}
 
-	try {
-		const updated = await authorService.updateAuthor(id, req.body);
-		if (!updated) {
-			return res.status(404).json({ message: "Không tìm thấy author" });
-		}
-		return res.status(200).json(updated);
-	} catch (error) {
-		return res.status(400).json({ message: (error as Error).message });
-	}
-};
-
-export const deleteAuthor = async (req: Request, res: Response) => {
-	const id = Number(req.params.id);
-	if (Number.isNaN(id)) {
-		return res.status(400).json({ message: "id không hợp lệ" });
+	getOne = async (req: Request, res: Response, next: NextFunction) => {
+		const id = parseInt(req.params.id as string)
+		const author = await authorService.getAuthorById(id)
+		new CreatedResponse('Get author successfully!', 200, author).send(res)
 	}
 
-	const deleted = await authorService.deleteAuthor(id);
-	if (!deleted) {
-		return res.status(404).json({ message: "Không tìm thấy author" });
+	update = async (req: Request, res: Response, next: NextFunction) => {
+		const id = parseInt(req.params.id as string)
+		const userId = req.headers['x-user-id'] as unknown as number
+		req.body.updatedBy = userId
+		const updatedAuthor = await authorService.updateAuthor(id, req.body)
+		new CreatedResponse('Update author successfully!', 200, updatedAuthor).send(res)
 	}
 
-	return res.status(200).json({ message: "Xóa author thành công", data: deleted });
-};
+	delete = async (req: Request, res: Response, next: NextFunction) => {
+		const id = parseInt(req.params.id as string)
+		await authorService.deleteAuthor(id)
+		new CreatedResponse('Delete author successfully!', 200).send(res)
+	}
+
+	
+}
+
+export const authorController = new AuthorController();

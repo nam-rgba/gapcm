@@ -1,3 +1,4 @@
+import { BadRequestError } from "../../utils/error.res";
 import { AuthorInsert, authorRepository } from "./author.repository";
 
 type AuthorPayload = {
@@ -7,7 +8,7 @@ type AuthorPayload = {
 
 function assertCreatePayload(payload: AuthorPayload): asserts payload is AuthorInsert {
 	if (!payload.author_name || !payload.email) {
-		throw new Error("author_name và email là bắt buộc");
+		throw new BadRequestError("author_name và email là bắt buộc");
 	}
 }
 
