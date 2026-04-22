@@ -1,5 +1,11 @@
 export const Permission = {
-    componentList: "component",
-    componentCreate: "component/create",
+
+    // components
+    componentList: "/components",
+    componentCreate: "/components/create",
     
+
+    // modules
+    moduleList: "/modules",
+    moduleCreate: "/modules/create"
 }
