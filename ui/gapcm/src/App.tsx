@@ -1,6 +1,6 @@
 import { RouterProvider } from 'react-router'
-import './App.css'
 import { routes } from './routes/index.route'
+import './styles/app.scss'
 
 function App() {
 

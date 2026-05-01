@@ -37,7 +37,7 @@ export const Header = (props: HeaderProps) => {
             ))}
         </div>
 
-        {props.isDropdown && props.dropdownItems &&         <div>
+        {props.isDropdown && props.dropdownItems && <div>
             <div className="dropdown relative">
                 <button className="dropdown-toggle flex items-center gap-1 text-gray-700 hover:text-gray-900">
                     {props.dropdownLabel}
