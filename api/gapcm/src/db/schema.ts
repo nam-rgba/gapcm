@@ -1,5 +1,6 @@
 import { integer, pgTable, varchar, pgEnum, boolean } from "drizzle-orm/pg-core";
 import { author } from "../modules/basic_crud/author.schema";
+import { module } from "../models/module.model";
 
 export const UILibValues = ["Ant", "ShadCN", "MUI"] as const;
 
@@ -28,22 +29,18 @@ export const fieldsTable = pgTable("fields",{
   fieldType:FieldTypes("field_type").notNull(),
   nullable: boolean().default(true),
   unit:boolean().default(false),
-  moduleId: integer("module_id").references(() => crudModulesTable.id, {
+  moduleId: integer("module_id").references(() => module.id, {
     onDelete: "cascade",
     onUpdate: "cascade",
   }),
 })
 
-export const crudModulesTable = pgTable("crud_modules", {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  moduleName: varchar("module_name", { length: 255 }).notNull(),
-  userId: integer("user_id").references(() => usersTable.id, {
-    onDelete: "set null",
-    onUpdate: "cascade",
-  }),
-});
+export const modulesTable = module;
 
 
-// modules table: các bảng của các modulee code mẫu
+
+
+// modules table: các bảng của các modulee code mẫu ==============================================================
 export const authorTable = author;
+
 
