@@ -6,7 +6,7 @@ export type AuthorInsert = typeof author.$inferInsert;
 export type AuthorUpdate = Partial<AuthorInsert>;
 
 export const authorRepository = {
-	async findAll() {
+	async findAll(): Promise<AuthorInsert[]> {
 		return db.select().from(author);
 	},
 

@@ -1,12 +1,12 @@
 import express, { Request, Response } from "express";
-import { authorRouter } from "./src/modules/basic_crud/author.route";
+import router from "./src/routes";
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 
-app.use("/api/authors", authorRouter);
+app.use("/api", router);
 
 app.get("/", (req: Request, res: Response) => {
   res.send({ message: "all good" });

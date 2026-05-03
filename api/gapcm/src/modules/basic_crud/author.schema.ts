@@ -1,5 +1,6 @@
 import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
 import {z} from "zod";
+import { BaseQuerySchema } from "../../interfaces/request";
 
 export const author = pgTable("authors", {
     id: integer().primaryKey().generatedByDefaultAsIdentity(),
@@ -8,12 +9,12 @@ export const author = pgTable("authors", {
 });
 
 
-export const AuthorQuerySchema = z.object({
-    page: z.coerce.number().min(1).default(1),
-    limit: z.coerce.number().min(1).max(100).default(10),
-    search: z.string().optional(),
+export const AuthorQuerySchema = BaseQuerySchema.extend({
+    sort: z.enum(["author_name", "email"]).optional(),
+    order: z.enum(["asc", "desc"]).optional(),
 })
 
 export type Author = typeof author.$inferSelect;
 export type AuthorInsert = typeof author.$inferInsert;
+export type GetAllAuthorsResponse = Omit<Author, "email">;
 
