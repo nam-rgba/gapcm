@@ -14,7 +14,13 @@ export const AuthorQuerySchema = BaseQuerySchema.extend({
     order: z.enum(["asc", "desc"]).optional(),
 })
 
+export const AuthorInsertSchema = z.object({
+    author_name: z.string().min(1).max(255),
+    email: z.string().max(255),
+})
+
 export type Author = typeof author.$inferSelect;
-export type AuthorInsert = typeof author.$inferInsert;
+export type AuthorInsert = z.infer<typeof AuthorInsertSchema>;
 export type GetAllAuthorsResponse = Omit<Author, "email">;
+export type GetAllAuthorsQuery = z.infer<typeof AuthorQuerySchema>;
 
