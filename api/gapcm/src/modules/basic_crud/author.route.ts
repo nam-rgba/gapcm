@@ -4,11 +4,13 @@ import {
 } from "./author.controller";
 import AsyncHandler from "../../utils/async-handler";
 import { validate } from "../../middlewares/validate";
-import { AuthorInsertSchema } from "./author.schema";
+import { AuthorInsertSchema, AuthorQuerySchema } from "./author.schema";
 
 export const authorRouter = Router();
 
-authorRouter.get("/", AsyncHandler(authorController.getAll));
+authorRouter.get("/", validate({
+  query: AuthorQuerySchema
+}),AsyncHandler(authorController.getAll));
 authorRouter.get("/:id", AsyncHandler(authorController.getOne));
 authorRouter.post("/",validate({body: AuthorInsertSchema}), AsyncHandler(authorController.create));
 authorRouter.patch("/:id", AsyncHandler(authorController.update));

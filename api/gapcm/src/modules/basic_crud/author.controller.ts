@@ -3,6 +3,7 @@
 import { NextFunction, Request, Response } from "express"
 import { CreatedResponse } from "../../utils/success.res"
 import { authorService } from "./author.service"
+import { GetAllAuthorsQuery } from "./author.schema"
 
 
 class AuthorController {
@@ -15,7 +16,9 @@ class AuthorController {
 	}
 
 	getAll = async (req: Request, res: Response, next: NextFunction) => {
-		const authors = await authorService.getAllAuthors()
+		const query = req.query as unknown as GetAllAuthorsQuery
+
+		const authors = await authorService.getAllAuthors(query)
 		new CreatedResponse('Get all authors successfully!', 200, authors).send(res)
 	}
 
