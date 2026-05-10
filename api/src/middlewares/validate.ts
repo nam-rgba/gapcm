@@ -23,6 +23,7 @@ export function validate({ body, query, params }: ValidationInput) {
 			if (!result.success) {
 				throw new BadRequestError(`${result.error.issues.map((i) => i.message).join(', ')}`)
 			}
+			console.log(result)
 			req.query = result.data as any
 		}
 
