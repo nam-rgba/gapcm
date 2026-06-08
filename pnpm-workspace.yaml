@@ -1,0 +1,10 @@
+packages:
+  - 'packages/*'
+  - 'app/*'
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+minimumReleaseAgeExclude:
+  - esbuild@0.24.3
+overrides:
+  esbuild@<=0.24.2: ^0.24.3

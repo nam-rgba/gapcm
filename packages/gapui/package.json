@@ -1,0 +1,23 @@
+{
+  "name": "@gapcm/gapui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --watch --dts"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "antd": ">=5"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "react": "^18.0.0",
+    "antd": "^5.0.0"
+  }
+}
