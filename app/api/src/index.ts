@@ -1,9 +1,10 @@
 
 import express from "express";
+import "reflect-metadata"
 
 const app = express();
 
-import router from "./routes";
+import router from "./routes/index.js";
 import cors from "cors";
 import { config } from "dotenv";
 
