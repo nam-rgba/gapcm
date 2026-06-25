@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { z } from 'zod'
-import { BadRequestError } from '../utils/error.res'
+import { BadRequestError } from '../utils/error.res.js'
 
 interface ValidationInput {
 	body?: z.ZodObject<any, any>;

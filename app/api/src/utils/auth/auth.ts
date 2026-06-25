@@ -1,5 +1,5 @@
-import AsyncHandler from '../async-handler'
-import { UnauthorizedError } from '../error.res'
+import AsyncHandler from '../async-handler.js'
+import { UnauthorizedError } from '../error.res.js'
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 
