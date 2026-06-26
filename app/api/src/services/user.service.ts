@@ -1,4 +1,5 @@
 import userRepository from "~/repository/user.repository.js";
+import {pick} from "lodash";
 
 
 class UserService {
@@ -11,7 +12,9 @@ class UserService {
     }
 
     public getById = async (id: number) => {
-        return await this.repo.findById(id)
+        const user = await this.repo.findById(id)
+        if (!user) throw new Error(`User with id ${id} not found`)
+        return user ? pick(user, ['id', 'name', 'email', 'isVerify']) : null
     }
 
     public create = async (user: any) => {

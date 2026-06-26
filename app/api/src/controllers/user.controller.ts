@@ -12,6 +12,15 @@ class UserController {
             await userService.getAll(req.query)
         )
     }
+
+    getById = async (req: Request, res: Response, next: NextFunction) => {
+        const id = Number(req.params.id)
+        return new OKResponse(
+            "Get user successfully!",
+            200,
+            await userService.getById(id)
+        )
+    }
 }
 
 const userController = new UserController();
