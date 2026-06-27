@@ -6,7 +6,6 @@ class UserService {
 
     private repo = userRepository;
 
-
     public getAll = async (query: any) => {
         return await this.repo.findAll(query)
     }
