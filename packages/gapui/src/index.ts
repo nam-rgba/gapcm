@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { Command } from 'commander';
 import fs from 'fs-extra';
 import path from 'path';
@@ -6,8 +8,11 @@ import { pascalCase, camelCase } from 'change-case';
 
 const program = new Command();
 
+program.name('gapcm').description('GAPCM resource generator');
+
 program
-  .command('g <name>') // Ví dụ: my-gen g User
+  .command('add <name>')
+  .alias('g')
   .description('Generate resource')
   .action(async (name) => {
     const moduleName = name;
