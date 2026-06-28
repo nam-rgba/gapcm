@@ -1,0 +1,66 @@
+<%
+const inputModuleName = typeof moduleName === "string" && moduleName.trim().length > 0
+  ? moduleName.trim()
+  : "sample"
+const words = inputModuleName
+  .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+  .split(/[-_\s]+/)
+  .filter(Boolean)
+const pascalName = words.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("")
+const camelName = pascalName.charAt(0).toLowerCase() + pascalName.slice(1)
+const pluralName = `${camelName}s`
+const kebabName = words.map((w) => w.toLowerCase()).join("-")
+%>
+
+import { NextFunction, Request, Response } from "express";
+import <%= camelName %>Service from "~/services/<%= kebabName %>.service.js";
+import { CreatedResponse, OKResponse } from "~/utils/success.res.js";
+
+class <%= pascalName %>Controller {
+
+	getAll = async(req: Request, res: Response, next: NextFunction) => {
+		return new OKResponse(
+			"Get <%= pluralName %> successfully!",
+			200,
+			await <%= camelName %>Service.getAll(req.query)
+		)
+	}
+
+	getById = async(req: Request, res: Response, next: NextFunction) => {
+		const id = Number(req.params.id)
+		return new OKResponse(
+			"Get <%= camelName %> successfully!",
+			200,
+			await <%= camelName %>Service.getById(id)
+		)
+	}
+
+	create = async(req: Request, res: Response, next: NextFunction) => {
+		return new CreatedResponse(
+			"Create <%= camelName %> successfully!",
+			201,
+			await <%= camelName %>Service.create(req.body)
+		)
+	}
+
+	update = async(req: Request, res: Response, next: NextFunction) => {
+		const id = Number(req.params.id)
+		return new OKResponse(
+			"Update <%= camelName %> successfully!",
+			200,
+			await <%= camelName %>Service.update(id, req.body)
+		)
+	}
+
+	delete = async(req: Request, res: Response, next: NextFunction) => {
+		const id = Number(req.params.id)
+		return new OKResponse(
+			"Delete <%= camelName %> successfully!",
+			200,
+			await <%= camelName %>Service.delete(id)
+		)
+	}
+}
+
+const <%= camelName %>Controller = new <%= pascalName %>Controller();
+export default <%= camelName %>Controller;

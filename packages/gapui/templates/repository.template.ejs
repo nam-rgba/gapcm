@@ -1,0 +1,58 @@
+<%
+const inputModuleName = typeof moduleName === "string" && moduleName.trim().length > 0
+  ? moduleName.trim()
+  : "sample"
+const words = inputModuleName
+  .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+  .split(/[-_\s]+/)
+  .filter(Boolean)
+const pascalName = words.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("")
+const camelName = pascalName.charAt(0).toLowerCase() + pascalName.slice(1)
+const kebabName = words.map((w) => w.toLowerCase()).join("-")
+const pluralName = `${camelName}s`
+%>
+
+import { DataSource, Repository } from "typeorm";
+import z from "zod";
+import { <%= pascalName %>, <%= pascalName %>Query } from "~/entities/<%= kebabName %>.entity.js";
+
+export class <%= pascalName %>Repository {
+	constructor(appDataSource: DataSource) {
+		this.repo = appDataSource.getRepository(<%= pascalName %>)
+	}
+
+	private repo: Repository<<%= pascalName %>>;
+
+	// find all <%= pluralName %> ==============================================
+	public findAll = async(query: z.infer<typeof <%= pascalName %>Query>) => {
+		const { page, limit, search } = query;
+		const [<%= pluralName %>, total] = await this.repo.findAndCount({
+			where: search ? { name: z.string().regex(new RegExp(search, "i")).parse(search) } as any : {},
+			skip: (page - 1) * limit,
+			take: limit,
+		});
+		return { <%= pluralName %>, total };
+	}
+
+	// find <%= camelName %> by id ==============================================
+	public findById = async(id: number) => {
+		return await this.repo.findOneBy({ id });
+	}
+
+	// create new <%= camelName %> ==============================================
+	public create = async(entity: Partial<<%= pascalName %>>) => {
+		const newEntity = this.repo.create(entity);
+		return await this.repo.save(newEntity);
+	}
+
+	// update <%= camelName %> by id ==============================================
+	public update = async(id: number, entity: Partial<<%= pascalName %>>) => {
+		await this.repo.update(id, entity);
+		return await this.repo.findOneBy({ id });
+	}
+
+	// delete <%= camelName %> by id ==============================================
+	public delete = async(id: number) => {
+		return await this.repo.delete(id);
+	}
+}

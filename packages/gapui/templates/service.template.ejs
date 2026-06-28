@@ -1,0 +1,52 @@
+<%
+const inputModuleName = typeof moduleName === "string" && moduleName.trim().length > 0
+  ? moduleName.trim()
+  : "sample"
+const words = inputModuleName
+  .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+  .split(/[-_\s]+/)
+  .filter(Boolean)
+const pascalName = words.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("")
+const camelName = pascalName.charAt(0).toLowerCase() + pascalName.slice(1)
+const kebabName = words.map((w) => w.toLowerCase()).join("-")
+%>
+
+import { pick } from "lodash";
+import { AppDataSource } from "~/data-source.js";
+import { <%= pascalName %>Repository } from "~/repository/<%= kebabName %>.repository.js";
+
+export class <%= pascalName %>Service {
+
+	constructor(repo: <%= pascalName %>Repository) {
+		this.repo = repo;
+	}
+
+	private repo: <%= pascalName %>Repository;
+
+	public getAll = async(query: any) => {
+		return await this.repo.findAll(query)
+	}
+
+	public getById = async(id: number) => {
+		const entity = await this.repo.findById(id)
+		if (!entity) throw new Error(`<%= pascalName %> with id ${id} not found`)
+		return entity ? pick(entity, ["id", "name", "description", "isVerify"]) : null
+	}
+
+	public create = async(payload: any) => {
+		return await this.repo.create(payload)
+	}
+
+	public update = async(id: number, payload: any) => {
+		return await this.repo.update(id, payload)
+	}
+
+	public delete = async(id: number) => {
+		return await this.repo.delete(id)
+	}
+}
+
+const <%= camelName %>Repo = new <%= pascalName %>Repository(AppDataSource);
+const <%= camelName %>Service = new <%= pascalName %>Service(<%= camelName %>Repo);
+
+export default <%= camelName %>Service;
