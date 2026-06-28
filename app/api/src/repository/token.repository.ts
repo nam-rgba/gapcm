@@ -1,4 +1,4 @@
-import { AppDataSource } from '~/data-source.js'
+import { DataSource, Repository } from 'typeorm'
 import { Token } from '~/entities/token.entity.js'
 
 interface ITokenPayload {
@@ -9,7 +9,11 @@ interface ITokenPayload {
 }
 
 export class TokenRepository {
-	private repo = AppDataSource.getRepository(Token)
+
+    constructor(appDataSource: DataSource) {
+        this.repo = appDataSource.getRepository(Token)
+    }
+	private repo : Repository<Token>
 
 	async createOrUpdateToken({ userId, accessKey, refreshKey, refreshToken }: ITokenPayload): Promise<Token | null> {
 		try {
@@ -34,7 +38,9 @@ export class TokenRepository {
 	async findAccessKey(userId: number): Promise<string | null> {
 		const session = await this.repo.findOne({
 			where: { userId },
-			select: ['accessKey']
+			select: {
+                accessKey: true
+            }
 		})
 		return session?.accessKey ?? null
 	}

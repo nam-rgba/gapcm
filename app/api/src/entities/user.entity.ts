@@ -12,6 +12,15 @@ import z from 'zod'
   name!: string
 
   @Column({
+    nullable: false,
+  })
+  password!: string
+
+
+  @Column()
+  avatar?: string
+
+  @Column({
     unique: true,
     nullable: false
   })

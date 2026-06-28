@@ -1,23 +1,24 @@
-import { getUserByEmail, createUser, checkRegistedEmail, updateUser } from './user.service.js'
 import bcrypt from 'bcryptjs'
 import { randomBytes } from 'crypto'
 import { createTokenPair } from '~/utils/auth/auth.js'
-import { SessionService } from './token.service.js'
 import _ from 'lodash'
-import { sendVerificationEmail, sendWelcomeEmail } from './email/auth-email.service.js'
-import { getOtpRepository } from '~/repository/otp.repository.js'
 import { OtpTokenType } from '~/entities/otp.entity.js'
 import axios from 'axios'
 import { AuthProvider } from '~/entities/auth.entity.js'
 import { BadRequestError } from '~/utils/error.res.js'
+import { OtpService, userService, sessionService } from '~/container.js'
+import { sendWelcomeEmail } from './auth-email.service.js'
 
-const sessionService = new SessionService()
 
-const otpRepo = getOtpRepository()
 
-const register = async (email: string, name: string, password: string) => {
+const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
+const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo'
+
+
+export class AuthService {
+     register = async (email: string, name: string, password: string) => {
 	// step 1: find if user exists
-	const existingUser = await checkRegistedEmail(email)
+	const existingUser = await userService.checkEmailExists(email)
 
 	if (existingUser) {
 		throw new BadRequestError('User already exists')
@@ -27,7 +28,7 @@ const register = async (email: string, name: string, password: string) => {
 	const hashedPassword = await bcrypt.hashSync(password, 10)
 
 	// step 3: create user
-	const newUser = await createUser({ email, password: hashedPassword, name })
+	const newUser = await userService.create({ email, password: hashedPassword, name })
 
 	// step 4:token setting
 	if (!newUser) throw new BadRequestError('Create user failed')
@@ -56,7 +57,7 @@ const register = async (email: string, name: string, password: string) => {
 
 	const resUser = _.pick(newUser, ['id', 'email'])
 
-	const otptoken = await otpRepo.create({
+	const otptoken = await OtpService.createOtp({
 		email: newUser.email,
 		token: randomBytes(16).toString('hex'),
 		expiresAt: new Date(Date.now() + 1 * 60 * 60 * 1000), // expires in 1 hours
@@ -67,13 +68,12 @@ const register = async (email: string, name: string, password: string) => {
 
 	if (!otptoken) throw new BadRequestError('Create otp token failed!')
 
-	await sendVerificationEmail(newUser.email, newUser.name!, otptoken.token)
 
 	return { user: resUser, token }
 }
 
-const login = async (email: string, password: string) => {
-	const existingUser = await getUserByEmail(email)
+ login = async (email: string, password: string) => {
+	const existingUser = await userService.getByEmail(email)
 	if (!existingUser) {
 		throw new BadRequestError('Email or password is incorrect')
 	}
@@ -109,8 +109,8 @@ const login = async (email: string, password: string) => {
 	return { user: resUser, token }
 }
 
-const verifyEmail = async (token: string) => {
-	const otpRecord = await otpRepo.findoneByToken(token)
+ verifyEmail = async (token: string) => {
+	const otpRecord = await OtpService.findByToken(token)
 	if (!otpRecord) {
 		throw new BadRequestError('Invalid or expired token')
 	}
@@ -119,21 +119,23 @@ const verifyEmail = async (token: string) => {
 		throw new BadRequestError('Token has expired')
 	}
 
-	const user = await getUserByEmail(otpRecord.email)
+	const user = await userService.getByEmail(otpRecord.email)
 	if (!user) {
 		throw new BadRequestError('User not found')
 	}
 
-	user.isEmailVerified = true
-	await updateUser(user.id!, { isEmailVerified: true })
+	user.isVerify = true
+	await userService.update(user.id!, { isVerify: true })
+
+    // send welcome email
+    await sendWelcomeEmail(user.email, user.name)
 
 	return user
 }
 
-const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
-const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo'
 
-const getGoogleAuthUrl = () => {
+
+ getGoogleAuthUrl = () => {
 	const clientId = process.env.GG_OAUTH_CLIENT_ID
 	const redirectUri = process.env.GG_OAUTH_REDIRECT_URI || 'http://localhost:3000/api/auth/google/callback'
 
@@ -149,7 +151,7 @@ const getGoogleAuthUrl = () => {
 	return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`
 }
 
-const googleLogin = async (code: string) => {
+ googleLogin = async (code: string) => {
 	const clientId = process.env.GG_OAUTH_CLIENT_ID
 	const clientSecret = process.env.GG_OAUTH_CLIENT_SECRET
 	const redirectUri = process.env.GG_OAUTH_REDIRECT_URI || 'http://localhost:3000/api/auth/google/callback'
@@ -172,21 +174,22 @@ const googleLogin = async (code: string) => {
 
 	if (!email) throw new BadRequestError('Cannot get email from Google')
 
-	let user = await getUserByEmail(email)
+	let user = await userService.getByEmail(email)
+    const isNewUser = !user || !user.id
 
 	if (!user || !user.id) {
-		const newUser = await createUser({
+		const newUser = await userService.create({
 			email,
 			name: name || '',
 			password: null,
 			avatar: picture || null,
-			isEmailVerified: true,
+			isVerify: true,
 			authProvider: AuthProvider.GOOGLE
 		} as any)
-		user = { ...newUser, skills: [], lastTeamId: undefined }
+		user = { ...newUser }
 	} else {
 		if (!user.avatar && picture) {
-			await updateUser(user.id, { avatar: picture })
+			await userService.update(user.id, { avatar: picture })
 			user.avatar = picture
 		}
 	}
@@ -213,8 +216,13 @@ const googleLogin = async (code: string) => {
 	})
 	if (!newUserWithToken) throw new BadRequestError('Create token row failed!')
 
+    // send welcome email if user is new
+    if (isNewUser) {
+        await sendWelcomeEmail(user.email, user.name)
+    }
+
 	const resUser = _.pick(user, ['id', 'email', 'avatar', 'name'])
 	return { user: resUser, token }
 }
 
-export { register, login, verifyEmail, getGoogleAuthUrl, googleLogin }
+}
