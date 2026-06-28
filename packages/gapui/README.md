@@ -1,30 +1,14 @@
 # @gapcm/gapui
 
-CLI generator for the `gapcm` monorepo.
+`@gapcm/gapui` is a small CLI generator for scaffolding API modules from EJS templates.
 
-## What it does
+## Features
 
-This package generates CRUD-style files from EJS templates for an API module:
-
-- `entity`
-- `repository`
-- `service`
-- `controller`
-- `route`
-
-It is published as a CLI command named `gapcm`.
+- Generates `entity`, `repository`, `service`, `controller`, and `route` files.
+- Uses your module name to render class names and file names consistently.
+- Publishes a single CLI command: `gapcm`.
 
 ## Install
-
-### Local test from the monorepo
-
-From `app/api`:
-
-```powershell
-pnpm exec gapcm add sample
-```
-
-### Global install from npm
 
 ```powershell
 npm install -g @gapcm/gapui
@@ -32,7 +16,7 @@ npm install -g @gapcm/gapui
 
 ## Usage
 
-Generate a module named `sample`:
+Generate a module:
 
 ```powershell
 gapcm add sample
@@ -44,31 +28,29 @@ Short alias:
 gapcm g sample
 ```
 
-## Output
+Run the command from the target API project folder so files are generated in the correct place.
 
-The generator writes files into the current project structure:
+## Generated files
 
-- `src/entities/<name>.entity.ts`
-- `src/repository/<name>.repository.ts`
-- `src/services/<name>.service.ts`
-- `src/controllers/<name>.controller.ts`
-- `src/routes/<name>.admin.ts`
+For a module named `sample`, the CLI creates:
 
-## Build
+- `src/entities/sample.entity.ts`
+- `src/repository/sample.repository.ts`
+- `src/services/sample.service.ts`
+- `src/controllers/sample.controller.ts`
+- `src/routes/sample.admin.ts`
 
-```powershell
-pnpm -C packages/gapui run build
-```
-
-## Publish
+## Example
 
 ```powershell
-cd packages/gapui
-npm login
-npm publish --access public
+cd app/api
+gapcm add user-profile
 ```
 
-## Notes
+This will generate files using `UserProfile` for class names and `userProfile` for file names.
 
-- The package publishes `dist` and `templates`.
-- The CLI expects to be run from the target project folder, for example `app/api`.
+## Publish notes
+
+- The package ships `dist` and `templates`.
+- The CLI entry point is `gapcm`.
+- The package is designed to be published publicly on npm.
