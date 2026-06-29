@@ -1,7 +1,7 @@
 {
-  "name": "@gapcm/gapui",
-  "version": "1.0.3",
-  "description": "",
+  "name": "@gapcm/cli",
+  "version": "1.0.4",
+  "description": "CLI scaffolder for building a larger full-stack framework across backend and frontend apps.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -16,22 +16,24 @@
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "dev": "tsup src/index.ts --format cjs,esm --watch --dts"
   },
-  "peerDependencies": {
-    "antd": ">=5",
-    "react": ">=18"
-  },
   "devDependencies": {
     "@types/ejs": "^3.1.5",
     "@types/fs-extra": "^11.0.4",
-    "antd": "^5.0.0",
-    "react": "^18.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },
+  "keywords": [
+    "cli",
+    "generator",
+    "scaffold",
+    "framework",
+    "fullstack",
+    "backend",
+    "frontend",
+    "typescript",
+    "ejs"
+  ],
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@mui/material": "^9.1.0",
     "chalk": "^5.6.2",
     "change-case": "^5.4.4",
     "commander": "^15.0.0",
