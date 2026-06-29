@@ -1,6 +1,7 @@
 {
   "name": "@gapcm/cli",
-  "version": "1.0.4",
+  "version": "1.0.5",
+  "license": "MIT",
   "description": "CLI scaffolder for building a larger full-stack framework across backend and frontend apps.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

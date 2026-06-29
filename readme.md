@@ -38,7 +38,7 @@ app/
 	api/   Backend server and database logic
 	ui/    Frontend app and pages
 packages/
-	gapui/ Shared package placeholder
+	cli/ Shared package placeholder
 ```
 
 ## Notes
