@@ -1,9 +1,9 @@
-import { Link } from 'react-router'
+import Experience from '../../components/experiences/Exp'
 
 export const Home = () => {
   return (
     <div>
-        <Link to={"/components"} children={"Gapcm"}/>
+       <Experience />
     </div>
   )
 }
