@@ -2,6 +2,8 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Float, Environment, MeshDistortMaterial, Sphere } from '@react-three/drei';
 
 const Scene = () => {
+
+    
   return (
     <>
       {/* 1. Ánh sáng môi trường thực tế (HDR) */}
