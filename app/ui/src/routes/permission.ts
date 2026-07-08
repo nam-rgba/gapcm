@@ -1,13 +1,5 @@
 export const Permission = {
 
-    // components
-    componentList: "components",
-    componentCreate: "create-component",
-    
-
-    // modules
-    moduleList: "modules",
-    moduleCreate: "create-module"
 }
 
 export enum ModuleCreateStep {
