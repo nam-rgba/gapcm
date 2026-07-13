@@ -2,11 +2,9 @@ import 'reflect-metadata'
 
 import express from 'express'
 import cors from 'cors'
-import { createServer } from 'http'
 import rateLimit from 'express-rate-limit'
 import router from './routes/index.js'
 import morgan from 'morgan'
-import { AppDataSource } from './data-source.js'
 import { connectDB } from './loaders/typeorm.js'
 
 async function startServer() {
