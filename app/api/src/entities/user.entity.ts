@@ -2,27 +2,31 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 import z from 'zod'
 
 @Entity()
- export class User {
+export class User {
   @PrimaryGeneratedColumn()
   id!: number
 
   @Column({
-    nullable: false
+    nullable: false,
+    type: 'varchar'
   })
   name!: string
 
   @Column({
     nullable: false,
+    type: 'varchar'
   })
   password!: string
 
-
-  @Column()
+  @Column({
+    type: 'varchar'
+  })
   avatar?: string
 
   @Column({
     unique: true,
-    nullable: false
+    nullable: false,
+    type: 'varchar'
   })
   email!: string
 
@@ -34,23 +38,16 @@ import z from 'zod'
 }
 
 export const UserQuery = z.object({
-    page: z.number().int().min(1).default(1),
-    limit: z.number().int().min(1).max(100).default(10),
-    search: z.string().optional(),
+  page: z.number().int().min(1).default(1),
+  limit: z.number().int().min(1).max(100).default(10),
+  search: z.string().optional()
 })
 
 export const UserCreateSchema = z.object({
-    name: z.string().min(1, { message: "Name is required" }),
-    email: z.email({ message: "Invalid email address" }),
+  name: z.string().min(1, { message: 'Name is required' }),
+  email: z.email({ message: 'Invalid email address' })
 })
 
 export const UserParamsSchema = z.object({
-    id: z.number().int().min(1, { message: "Invalid user ID" }),
+  id: z.number().int().min(1, { message: 'Invalid user ID' })
 })
-
-
-
-
-
-
-
