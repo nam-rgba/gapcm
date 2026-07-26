@@ -14,9 +14,12 @@
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "^11.0.9",
+      "version": "11.0.9",
       "onFail": "download"
     }
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
 }
