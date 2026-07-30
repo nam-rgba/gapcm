@@ -1,0 +1,43 @@
+<%
+const inputModuleName = typeof moduleName === 'string' && moduleName.trim().length > 0
+  ? moduleName.trim()
+  : 'Sample'
+const normalized = inputModuleName.replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
+const entityName = normalized.charAt(0).toUpperCase() + normalized.slice(1)
+const entityNameLower = entityName.charAt(0).toLowerCase() + entityName.slice(1)
+%>
+
+import z from 'zod'
+
+export const <%= entityName %>Query = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+  search: z.string().optional()
+})
+
+export const <%= entityName %>CreateSchema = z.object({
+  name: z
+    .string({
+      message: 'Name is required'
+    })
+    .min(2, { message: 'Name is too short' })
+    .max(255, { message: 'Name is too long' }),
+  price: z.coerce
+    .number({
+      message: 'Price is required'
+    })
+    .min(0, { message: 'Price must be a positive number' })
+})
+
+export const <%= entityName %>ParamsSchema = z.object({
+  id: z.number().int().min(1, { message: 'Invalid <%= entityNameLower %> ID' })
+})
+
+export const <%= entityName %>ResponseSchema = z.object({
+  id: z.number().int(),
+  name: z.string(),
+  description: z.string().optional(),
+  price: z.number()
+})
+
+export type <%= entityName %>Response = z.infer<typeof <%= entityName %>ResponseSchema>

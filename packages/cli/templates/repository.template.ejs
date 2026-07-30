@@ -14,7 +14,8 @@ const pluralName = `${camelName}s`
 
 import { DataSource, Repository } from "typeorm";
 import z from "zod";
-import { <%= pascalName %>, <%= pascalName %>Query } from "~/entities/<%= kebabName %>.entity.js";
+import { <%= pascalName %> } from "~/entities/<%= kebabName %>.entity.js";
+import { <%= pascalName %>Query } from "~/entities/dto/<%= kebabName %>.dto.js";
 
 export class <%= pascalName %>Repository {
 	constructor(appDataSource: DataSource) {
