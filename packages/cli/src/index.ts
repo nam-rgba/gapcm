@@ -94,15 +94,22 @@ program
       // TH1: File container.ts CHƯA TỒN TẠI -> Tạo mới từ đầu
       const initialContent = `import { AppDataSource } from '~/data-source.js';\n${importRepo}\n${importService}\n${registrationCode}`;
       await fs.outputFile(containerPath, initialContent);
+      console.log(`Created new container file: ${containerPath}`);
     } else {
       // TH2: File container.ts ĐÃ TỒN TẠI -> Append thêm vào
       let content = await fs.readFile(containerPath, "utf-8");
 
       // Kiểm tra xem Service này đã được đăng ký trong container chưa
-      if (!content.includes(`${camelName}Service`)) {
+      if (content.includes(`${camelName}Service`)) {
+        console.log(
+          `[Skip] ${camelName}Service already exists in container.ts`,
+        );
+      } else {
+        // Chèn 2 dòng import vào đầu file và append đoạn khởi tạo vào cuối file
         content =
           `${importRepo}\n${importService}\n` + content + registrationCode;
         await fs.outputFile(containerPath, content);
+        console.log(`Updated container file: ${containerPath}`);
       }
     }
   });
