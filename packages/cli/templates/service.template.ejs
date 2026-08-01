@@ -1,36 +1,35 @@
-import z from 'zod' import
-{pick } from 'lodash'
-import { AppDataSource } from '~/data-source.js'
-import { <%= pascalName %>Query } from '~/entities/dto/<%= camelName %>.dto.js'
+
+<!-- service -->
 import { <%= pascalName %>Repository } from '~/repository/<%= camelName %>.repository.js'
+import _ from 'lodash'
+const { pick } = _
 
 export class <%= pascalName %>Service {
-    private repo: <%= pascalName %>Repository
+  constructor(repo: <%= pascalName %>Repository) {
+    this.repo = repo
+  }
 
-    constructor(repo: <%= pascalName %>Repository) {
-        this.repo = repo
-    }
+  private repo: <%= pascalName %>Repository
 
-    public getAll = async (query: z.infer<typeof <%= pascalName %>Query>) => {
-        return await this.repo.findAll(query)
-    }
+  public getAll = async (query: any) => {
+    return await this.repo.findAll(query)
+  }
 
-    public getById = async (id: number) => {
-        const entity = await this.repo.findById(id)
-        if (!entity) throw new Error(`<%= pascalName %> with id ${id} not found`)
-        return pick(entity, ['id',
-  'name', 'description', 'isVerify'])
-    }
+  public getById = async (id: number) => {
+    const entity = await this.repo.findById(id)
+    if (!entity) throw new Error(`<%= pascalName %> with id ${id} not found`)
+    return pick(entity, ['id', 'name', 'description', 'isVerify'])
+  }
 
-    public create = async (payload: any) => {
+  public create = async (payload: any) => {
     return await this.repo.create(payload)
   }
+
   public update = async (id: number, payload: any) => {
     return await this.repo.update(id, payload)
   }
-  public delete = async (id: number) => {return await this.repo.delete(id)}
-}
 
-const <%= camelName %>Repo = new <%= pascalName %>Repository(AppDataSource)
-const <%= camelName %>Service = new <%= pascalName %>Service(<%= camelName
-%>Repo) export default <%= camelName %>Service
+  public delete = async (id: number) => {
+    return await this.repo.delete(id)
+  }
+}
