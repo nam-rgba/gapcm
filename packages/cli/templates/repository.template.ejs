@@ -1,59 +1,45 @@
-<%
-const inputModuleName = typeof moduleName === "string" && moduleName.trim().length > 0
-  ? moduleName.trim()
-  : "sample"
-const words = inputModuleName
-  .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
-  .split(/[-_\s]+/)
-  .filter(Boolean)
-const pascalName = words.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("")
-const camelName = pascalName.charAt(0).toLowerCase() + pascalName.slice(1)
-const kebabName = words.map((w) => w.toLowerCase()).join("-")
-const pluralName = `${camelName}s`
-%>
-
-import { DataSource, Repository } from "typeorm";
+import { DataSource, Repository, ILike } from "typeorm";
 import z from "zod";
-import { <%= pascalName %> } from "~/entities/<%= kebabName %>.entity.js";
-import { <%= pascalName %>Query } from "~/entities/dto/<%= kebabName %>.dto.js";
+import { <%= pascalName %> } from "~/entities/<%= camelName %>.entity.js";
+import { <%= pascalName %>Query } from "~/entities/dto/<%= camelName %>.dto.js";
 
 export class <%= pascalName %>Repository {
-	constructor(appDataSource: DataSource) {
-		this.repo = appDataSource.getRepository(<%= pascalName %>)
-	}
+    private repo: Repository<<%= pascalName %>>;
 
-	private repo: Repository<<%= pascalName %>>;
+    constructor(appDataSource: DataSource) {
+        this.repo = appDataSource.getRepository(<%= pascalName %>);
+    }
 
-	// find all <%= pluralName %> ==============================================
-	public findAll = async(query: z.infer<typeof <%= pascalName %>Query>) => {
-		const { page, limit, search } = query;
-		const [<%= pluralName %>, total] = await this.repo.findAndCount({
-			where: search ? { name: z.string().regex(new RegExp(search, "i")).parse(search) } as any : {},
-			skip: (page - 1) * limit,
-			take: limit,
-		});
-		return { <%= pluralName %>, total };
-	}
+    // Find all <%= camelName %>s
+    public findAll = async (query: z.infer<typeof <%= pascalName %>Query>) => {
+        const { page, limit, search } = query;
+        const [items, total] = await this.repo.findAndCount({
+            where: search ? { name: ILike(`%${search}%`) } : {},
+            skip: (page - 1) * limit,
+            take: limit,
+        });
+        return { items, total };
+    }
 
-	// find <%= camelName %> by id ==============================================
-	public findById = async(id: number) => {
-		return await this.repo.findOneBy({ id });
-	}
+    // Find <%= camelName %> by id
+    public findById = async (id: number) => {
+        return await this.repo.findOneBy({ id } as any);
+    }
 
-	// create new <%= camelName %> ==============================================
-	public create = async(entity: Partial<<%= pascalName %>>) => {
-		const newEntity = this.repo.create(entity);
-		return await this.repo.save(newEntity);
-	}
+    // Create new <%= camelName %>
+    public create = async (entity: Partial<<%= pascalName %>>) => {
+        const newEntity = this.repo.create(entity);
+        return await this.repo.save(newEntity);
+    }
 
-	// update <%= camelName %> by id ==============================================
-	public update = async(id: number, entity: Partial<<%= pascalName %>>) => {
-		await this.repo.update(id, entity);
-		return await this.repo.findOneBy({ id });
-	}
+    // Update <%= camelName %> by id
+    public update = async (id: number, entity: Partial<<%= pascalName %>>) => {
+        await this.repo.update(id, entity);
+        return await this.repo.findOneBy({ id } as any);
+    }
 
-	// delete <%= camelName %> by id ==============================================
-	public delete = async(id: number) => {
-		return await this.repo.delete(id);
-	}
+    // Delete <%= camelName %> by id
+    public delete = async (id: number) => {
+        return await this.repo.delete(id);
+    }
 }

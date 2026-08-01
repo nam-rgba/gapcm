@@ -1,15 +1,7 @@
-<%
-const inputModuleName = typeof moduleName === 'string' && moduleName.trim().length > 0
-  ? moduleName.trim()
-  : 'Sample'
-const normalized = inputModuleName.replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
-const entityName = normalized.charAt(0).toUpperCase() + normalized.slice(1)
-%>
-
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity()
-export class <%= entityName %> {
+export class <%= pascalName %> {
   @PrimaryGeneratedColumn()
   id!: number
 
@@ -18,14 +10,15 @@ export class <%= entityName %> {
   })
   name!: string
 
-  @Column()
+  @Column({
+    nullable: true
+  })
   image?: string
 
   @Column({
-    unique: true,
-    nullable: false
+    nullable: true
   })
-  description!: string
+  description?: string
 
   @Column({
     type: 'boolean',
