@@ -58,6 +58,7 @@ program
       },
     ];
 
+    // step 1: render các file
     for (const temp of templates) {
       const templateContent = await fs.readFile(
         path.join(__dirname, `../templates/${temp.path}`),
@@ -78,6 +79,31 @@ program
 
       await fs.outputFile(outputPath, rendered);
       console.log(`Generated: ${outputPath}`);
+    }
+
+    // step 2: add và dùng ở container
+    const containerPath = path.join(process.cwd(), "src/container.ts");
+    const importRepo = `import { ${pascalName}Repository } from '~/repository/${camelName}.repository.js';`;
+    const importService = `import { ${pascalName}Service } from '~/services/${camelName}.service.js';`;
+
+    const registrationCode = `\n// ${camelName}\nconst ${camelName}Repo = new ${pascalName}Repository(AppDataSource);\nexport const ${camelName}Service = new ${pascalName}Service(${camelName}Repo);\n`;
+
+    const containerExists = await fs.pathExists(containerPath);
+
+    if (!containerExists) {
+      // TH1: File container.ts CHƯA TỒN TẠI -> Tạo mới từ đầu
+      const initialContent = `import { AppDataSource } from '~/data-source.js';\n${importRepo}\n${importService}\n${registrationCode}`;
+      await fs.outputFile(containerPath, initialContent);
+    } else {
+      // TH2: File container.ts ĐÃ TỒN TẠI -> Append thêm vào
+      let content = await fs.readFile(containerPath, "utf-8");
+
+      // Kiểm tra xem Service này đã được đăng ký trong container chưa
+      if (!content.includes(`${camelName}Service`)) {
+        content =
+          `${importRepo}\n${importService}\n` + content + registrationCode;
+        await fs.outputFile(containerPath, content);
+      }
     }
   });
 
